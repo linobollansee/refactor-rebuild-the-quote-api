@@ -1,15 +1,28 @@
 # Quote API - RESTful API with NestJS
 
-A simple, beginner-friendly Quote API built with NestJS following RESTful principles.
+**English** | [Deutsch](#deutsch)
+
+A simple, beginner-friendly Quote API built with NestJS following RESTful principles, featuring SQLite database persistence.
+
+---
 
 ## Features
 
-✅ RESTful API design with proper HTTP methods
-✅ DTO (Data Transfer Object) layer with validation
-✅ User CRUD operations (for upcoming authorization)
-✅ Quote CRUD operations
-✅ Validation pipes for input data
-✅ Query parameters (filter, limit)
+✅ RESTful API design with proper HTTP methods  
+✅ DTO (Data Transfer Object) layer with validation  
+✅ User CRUD operations (for upcoming authorization)  
+✅ Quote CRUD operations  
+✅ Validation pipes for input data  
+✅ Query parameters (filter, limit)  
+✅ SQLite database with TypeORM
+
+## Tech Stack
+
+- **NestJS** - Progressive Node.js framework
+- **TypeORM** - Object-Relational Mapping
+- **SQLite** - Lightweight database
+- **class-validator** - DTO validation
+- **TypeScript** - Type-safe JavaScript
 
 ## Installation
 
@@ -75,10 +88,10 @@ The `api-tests.http` file includes 25 pre-configured test cases:
 Invoke-RestMethod -Uri http://localhost:3000/quotes -Method GET
 ```
 
-#### Get Quote by ID
+#### Create a Quote
 
 ```powershell
-Invoke-RestMethod -Uri http://localhost:3000/quotes/1 -Method GET
+Invoke-RestMethod -Uri http://localhost:3000/quotes -Method POST -ContentType "application/json" -Body '{"text": "Life is what happens when you are busy making other plans.", "author": "John Lennon"}'
 ```
 
 #### Get with Query Parameters
@@ -89,48 +102,6 @@ Invoke-RestMethod -Uri "http://localhost:3000/quotes?limit=1" -Method GET
 
 # Filter by author
 Invoke-RestMethod -Uri "http://localhost:3000/quotes?author=Oscar" -Method GET
-```
-
-#### Create a Quote
-
-```powershell
-Invoke-RestMethod -Uri http://localhost:3000/quotes -Method POST -ContentType "application/json" -Body '{"text": "Life is what happens when you are busy making other plans.", "author": "John Lennon"}'
-```
-
-#### Update a Quote
-
-```powershell
-Invoke-RestMethod -Uri http://localhost:3000/quotes/1 -Method PUT -ContentType "application/json" -Body '{"text": "Updated quote text"}'
-```
-
-#### Delete a Quote
-
-```powershell
-Invoke-RestMethod -Uri http://localhost:3000/quotes/1 -Method DELETE
-```
-
-#### Create a User
-
-```powershell
-Invoke-RestMethod -Uri http://localhost:3000/users -Method POST -ContentType "application/json" -Body '{"email": "john@example.com", "password": "securepass123"}'
-```
-
-#### Get All Users
-
-```powershell
-Invoke-RestMethod -Uri http://localhost:3000/users -Method GET
-```
-
-#### Update a User
-
-```powershell
-Invoke-RestMethod -Uri http://localhost:3000/users/1 -Method PUT -ContentType "application/json" -Body '{"email": "newemail@example.com"}'
-```
-
-#### Delete a User
-
-```powershell
-Invoke-RestMethod -Uri http://localhost:3000/users/1 -Method DELETE
 ```
 
 ### Option 3: Using curl (Bash/Linux)
@@ -178,17 +149,27 @@ src/
 
 Data is stored in **SQLite** database (`quote-api.db`):
 
-- Persistent storage (survives server restarts)
-- TypeORM for database management
-- Automatic table creation on first run
-- Database file created in project root
+- **Persistent storage** - Data survives server restarts
+- **TypeORM** - Database management
+- **Automatic table creation** - Created on first run
+- **Location** - Project root directory
 
 ### Database Features
 
-- Auto-generated IDs
-- Timestamps (createdAt)
+- Auto-generated IDs (primary keys)
+- Automatic timestamps (createdAt)
 - Unique email constraint for users
-- LIKE queries for author filtering
+- LIKE queries for filtering
+
+### Reset Database
+
+To start fresh with ID 1:
+
+```powershell
+# Stop server, delete database, restart
+Remove-Item quote-api.db
+npm run start:dev
+```
 
 ## Validation
 
@@ -197,12 +178,214 @@ All DTOs use `class-validator` decorators:
 - `@IsString()` - Validates string type
 - `@IsEmail()` - Validates email format
 - `@IsNotEmpty()` - Ensures field is not empty
-- `@MinLength(6)` - Minimum length validation
-- `@IsOptional()` - Field is optional
+- `@MinLength(6)` - Minimum length validation (e.g., passwords)
+- `@IsOptional()` - Field is optional for updates
+
+## Code Comments
+
+All TypeScript files are fully commented in **English** and **German** for beginner-friendly understanding.
 
 ## Notes
 
 - Data persists in SQLite database file
-- Passwords are stored as plain text (for learning purposes only)
+- Passwords are stored as plain text (for learning purposes only - never do this in production!)
 - Ready for future authentication/authorization implementation
-- Database file: `quote-api.db` (can be deleted to reset data)
+- Database file: `quote-api.db` (delete to reset data)
+
+---
+
+<a name="deutsch"></a>
+
+# Quote API - RESTful API mit NestJS
+
+[English](#quote-api---restful-api-with-nestjs) | **Deutsch**
+
+Eine einfache, anfängerfreundliche Quote API, gebaut mit NestJS nach RESTful-Prinzipien, mit SQLite-Datenbank-Persistenz.
+
+---
+
+## Funktionen
+
+✅ RESTful API-Design mit korrekten HTTP-Methoden  
+✅ DTO (Data Transfer Object) Schicht mit Validierung  
+✅ Benutzer CRUD-Operationen (für zukünftige Autorisierung)  
+✅ Zitat CRUD-Operationen  
+✅ Validierungs-Pipes für Eingabedaten  
+✅ Abfrageparameter (Filter, Limit)  
+✅ SQLite-Datenbank mit TypeORM
+
+## Technologie-Stack
+
+- **NestJS** - Progressives Node.js Framework
+- **TypeORM** - Objekt-Relationales Mapping
+- **SQLite** - Leichtgewichtige Datenbank
+- **class-validator** - DTO-Validierung
+- **TypeScript** - Typsicheres JavaScript
+
+## Installation
+
+```bash
+npm install
+```
+
+## Die App starten
+
+```bash
+# Entwicklungsmodus mit Hot Reload
+npm run start:dev
+
+# Produktionsmodus
+npm start
+```
+
+Die API läuft auf `http://localhost:3000`
+
+## API-Endpunkte
+
+### Zitate
+
+| Methode | Endpunkt               | Beschreibung             | Body-Beispiel                                    |
+| ------- | ---------------------- | ------------------------ | ------------------------------------------------ |
+| GET     | `/quotes`              | Alle Zitate abrufen      | -                                                |
+| GET     | `/quotes?limit=5`      | Begrenzte Zitate abrufen | -                                                |
+| GET     | `/quotes?author=Oscar` | Nach Autor filtern       | -                                                |
+| GET     | `/quotes/:id`          | Zitat nach ID abrufen    | -                                                |
+| POST    | `/quotes`              | Neues Zitat erstellen    | `{"text": "Zitat Text", "author": "Autor Name"}` |
+| PUT     | `/quotes/:id`          | Zitat aktualisieren      | `{"text": "Aktualisierter Text"}`                |
+| DELETE  | `/quotes/:id`          | Zitat löschen            | -                                                |
+
+### Benutzer
+
+| Methode | Endpunkt          | Beschreibung               | Body-Beispiel                                              |
+| ------- | ----------------- | -------------------------- | ---------------------------------------------------------- |
+| GET     | `/users`          | Alle Benutzer abrufen      | -                                                          |
+| GET     | `/users?limit=10` | Begrenzte Benutzer abrufen | -                                                          |
+| GET     | `/users/:id`      | Benutzer nach ID abrufen   | -                                                          |
+| POST    | `/users`          | Neuen Benutzer erstellen   | `{"email": "user@example.com", "password": "password123"}` |
+| PUT     | `/users/:id`      | Benutzer aktualisieren     | `{"email": "neuemail@example.com"}`                        |
+| DELETE  | `/users/:id`      | Benutzer löschen           | -                                                          |
+
+## API testen
+
+### Option 1: REST Client Extension (Empfohlen)
+
+Installiere die **REST Client** Extension von Huachao Mao in VS Code, öffne dann `api-tests.http` und klicke auf "Send Request" über jedem Endpunkt.
+
+Die `api-tests.http` Datei enthält 25 vorkonfigurierte Testfälle:
+
+- Alle CRUD-Operationen für Zitate und Benutzer
+- Abfrageparameter-Tests (Limit, Filter)
+- Validierungstests
+- Fehlerbehandlungstests
+
+### Option 2: PowerShell-Befehle verwenden
+
+#### Alle Zitate abrufen
+
+```powershell
+Invoke-RestMethod -Uri http://localhost:3000/quotes -Method GET
+```
+
+#### Ein Zitat erstellen
+
+```powershell
+Invoke-RestMethod -Uri http://localhost:3000/quotes -Method POST -ContentType "application/json" -Body '{"text": "Das Leben ist das, was passiert, während du andere Pläne machst.", "author": "John Lennon"}'
+```
+
+#### Mit Abfrageparametern abrufen
+
+```powershell
+# Ergebnisse begrenzen
+Invoke-RestMethod -Uri "http://localhost:3000/quotes?limit=1" -Method GET
+
+# Nach Autor filtern
+Invoke-RestMethod -Uri "http://localhost:3000/quotes?author=Oscar" -Method GET
+```
+
+### Option 3: curl verwenden (Bash/Linux)
+
+```bash
+# Ein Zitat erstellen
+curl -X POST http://localhost:3000/quotes \
+  -H "Content-Type: application/json" \
+  -d '{"text": "Das Leben ist das, was passiert, während du andere Pläne machst.", "author": "John Lennon"}'
+
+# Alle Zitate abrufen
+curl http://localhost:3000/quotes
+
+# Mit Filtern abrufen
+curl http://localhost:3000/quotes?author=Oscar&limit=2
+```
+
+## Projektstruktur
+
+```
+src/
+├── main.ts                 # Anwendungseinstiegspunkt
+├── app.module.ts           # Hauptmodul
+├── quotes/
+│   ├── quotes.module.ts    # Zitate-Modul
+│   ├── quotes.controller.ts # REST-Endpunkte
+│   ├── quotes.service.ts   # Geschäftslogik
+│   ├── dto/
+│   │   ├── create-quote.dto.ts
+│   │   └── update-quote.dto.ts
+│   └── entities/
+│       └── quote.entity.ts
+└── users/
+    ├── users.module.ts     # Benutzer-Modul
+    ├── users.controller.ts # REST-Endpunkte
+    ├── users.service.ts    # Geschäftslogik
+    ├── dto/
+    │   ├── create-user.dto.ts
+    │   └── update-user.dto.ts
+    └── entities/
+        └── user.entity.ts
+```
+
+## Datenbank
+
+Daten werden in **SQLite**-Datenbank (`quote-api.db`) gespeichert:
+
+- **Persistente Speicherung** - Daten überleben Server-Neustarts
+- **TypeORM** - Datenbankverwaltung
+- **Automatische Tabellenerstellung** - Beim ersten Start erstellt
+- **Speicherort** - Projekt-Hauptverzeichnis
+
+### Datenbankfunktionen
+
+- Automatisch generierte IDs (Primärschlüssel)
+- Automatische Zeitstempel (createdAt)
+- Eindeutige E-Mail-Beschränkung für Benutzer
+- LIKE-Abfragen zum Filtern
+
+### Datenbank zurücksetzen
+
+Um mit ID 1 neu zu beginnen:
+
+```powershell
+# Server stoppen, Datenbank löschen, neu starten
+Remove-Item quote-api.db
+npm run start:dev
+```
+
+## Validierung
+
+Alle DTOs verwenden `class-validator` Dekoratoren:
+
+- `@IsString()` - Validiert String-Typ
+- `@IsEmail()` - Validiert E-Mail-Format
+- `@IsNotEmpty()` - Stellt sicher, dass Feld nicht leer ist
+- `@MinLength(6)` - Mindestlängen-Validierung (z.B. Passwörter)
+- `@IsOptional()` - Feld ist optional für Updates
+
+## Code-Kommentare
+
+Alle TypeScript-Dateien sind vollständig in **Englisch** und **Deutsch** kommentiert für anfängerfreundliches Verständnis.
+
+## Hinweise
+
+- Daten bleiben in der SQLite-Datenbankdatei erhalten
+- Passwörter werden als Klartext gespeichert (nur zu Lernzwecken - niemals in Produktion!)
+- Bereit für zukünftige Authentifizierungs-/Autorisierungsimplementierung
+- Datenbankdatei: `quote-api.db` (löschen zum Zurücksetzen der Daten)
